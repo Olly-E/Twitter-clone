@@ -16,7 +16,9 @@ export default function Post({post}) {
   const [likes, setLikes] = useState([]);
   const [hasLiked, setHasLiked] = useState(false);
   const [open, setOpen] = useRecoilState(modalState)
-  const [postId, setPostId] = useRecoilState(postIdState)
+  const [postId, setPostId] = useRecoilState(postIdState);
+  const [comments, setComments] = useState([])
+  // const [hasCommented, setHasCommented] = useState(false)
 
   useEffect(() => {
     const unsubscribe =  onSnapshot(
@@ -43,6 +45,13 @@ export default function Post({post}) {
     }
   }
 
+  useEffect(() => {
+    const commentSub = onSnapshot(
+      collection(db, 'posts', post.id, 'comments'),
+      (snapshot) => setComments(snapshot.docs)
+    )
+  },[db])
+
   const deletePost = async() => {
     if(window.confirm('Are you sure you want to delete this post')){
     deleteDoc(doc(db, "posts", post.id));
@@ -58,7 +67,7 @@ export default function Post({post}) {
       <img src={post.data().userImg} alt="user-img" className="h-11 w-11 rounded-full mr-4"/>
 
 {/* right side */}
-        <div className="">
+        <div className="flex-1">
             {/* Header */}
             <div className="flex items-center justify-between">
                 {/* post user info */}
@@ -81,6 +90,7 @@ export default function Post({post}) {
             {/* icons */}
               
             <div className="flex justify-between text-gray-500 p-2">
+              <div className="flex items-center select-none">
               <ChatIcon 
                 onClick={() => {
                   if(!session){
@@ -88,14 +98,19 @@ export default function Post({post}) {
                   } else {
                     setPostId(post.id)
                     setOpen(!open)} 
+
                   }
                    
                 }
                 className="h-9 w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100"/>
+                {comments.length > 0 && (
+                  <span className='text-sm select-none'>{comments.length}</span>
+                )}
+                </div>
               {session?.user.uid === post?.data().id && (
                 <TrashIcon onClick={deletePost} className="h-9 w-9 hoverEffect p-2 hover:text-red-600 hover:bg-red-100"/>
               )}
-              <div className="flex items-center">
+              <div className="flex items-center select-none">
                 {hasLiked ? (
                   <HeartIconFilled onClick={likePost}  className="h-9 w-9 hoverEffect p-2 text-red-600 hover:bg-red-100"/>
                 ): (

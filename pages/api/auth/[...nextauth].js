@@ -12,6 +12,9 @@ export const authOptions = {
   pages: {
     signIn:"/auth/signin"
   },
+
+  secret: process.env.SECRET,
+
   callbacks: {
     async session({session, token}){
         session.user.username = session.user.name

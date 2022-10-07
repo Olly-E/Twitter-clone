@@ -24,6 +24,7 @@ export default function Widgets({newsResults, randomUsersResults}) {
           animate={{opacity: 1}}
           exit={{opacity: 0}}
           transition={{duration: 1}}
+          key={article.title}
           >
             <News key={article.title} article={article} />
           </motion.div>
